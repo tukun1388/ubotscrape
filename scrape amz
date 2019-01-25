@@ -1,0 +1,15 @@
+ui stat monitor("Product Link: ",$list total(%productlink))
+define Scrape Data {
+    clear table(&productdata)
+    clear list(%productlink)
+    navigate("https://www.amazon.com/s/ref=nb_sb_noss?url=node%3D9103696011&field-keywords=Lightweight%2C+Classic+fit%2C+Double-needle+sleeve+and+bottom+hem+pig+year&rh=n:9103696011%2Ck:Lightweight%5Cc+Classic+fit%5Cc+Double-needle+sleeve+and+bottom+hem+pig+year","Wait")
+    wait for browser event("Page Loaded","")
+    add list to list(%productlink,$scrape attribute(<(class="a-link-normal a-text-normal" AND href=r"(https://amazon.com/*/*/?")>,"href"),"Delete","Global")
+    loop while($exists(<class="pagnNext">)) {
+        click(<id="pagnNextString">,"Left Click","No")
+        add list to list(%productlink,$scrape attribute(<class="a-link-normal a-text-normal">,"href"),"Delete","Global")
+    }
+    add list to table as column(&productdata,0,0,%productlink)
+    save to file("{$special folder("Desktop")}/productdata.csv",&productdata)
+}
+Scrape Data()
